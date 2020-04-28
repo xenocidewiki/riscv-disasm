@@ -2,7 +2,7 @@
 
 namespace riscv {
 	namespace instruction {
-		const uint8_t object::get_opcode(const uint32_t& instruction) const
+		const uint8_t object::get_opcode(const uint32_t instruction) const
 		{
 			/*
 			Clears out all bits except last 7 (opcode)
@@ -11,14 +11,14 @@ namespace riscv {
 			return instruction & 0x0000007f;
 		}
 
-		const type_identifier object::set_instruction_format(const uint32_t& instruction) const
+		const type_identifier object::set_instruction_format(const uint32_t instruction) const
 		{
 			const uint8_t opcode = get_opcode(instruction);
 			
 			return opcode_instruction_type.at(opcode);
 		}
 
-		const object::instruction_format object::set_instruction_data(const type_identifier& type, const uint32_t& instruction)
+		const object::instruction_format object::set_instruction_data(const type_identifier type, const uint32_t instruction)
 		{	
 			switch(type)
 			{
@@ -46,6 +46,16 @@ namespace riscv {
 			default:
 				return type_r{ 0 };
 			}
+		}
+
+		const object::instruction_format object::get_data() const
+		{
+			return m_data;
+		}
+
+		const type_identifier object::get_type() const
+		{
+			return m_type;
 		}
 	}
 }

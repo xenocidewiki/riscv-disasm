@@ -110,20 +110,20 @@ namespace riscv
 			const type_identifier m_type;
 			const instruction_format m_data;
 
-			const uint8_t get_opcode(const uint32_t& instruction) const;
-			const type_identifier set_instruction_format(const uint32_t& instruction) const;
-			const instruction_format set_instruction_data(const type_identifier& type, const uint32_t& instruction);
+			const uint8_t get_opcode(const uint32_t instruction) const;
+			const type_identifier set_instruction_format(const uint32_t instruction) const;
+			const instruction_format set_instruction_data(const type_identifier type, const uint32_t instruction);
 
 		public:
 			object() = delete;
-			object(const object& obj) = delete;
-			object(object&& obj) = delete;
+			object(const object& obj) = default;
+			object(object&& obj) = default;
 
-			explicit object(const uint32_t& inst) : m_type { set_instruction_format(inst) }, m_data{ set_instruction_data(m_type, inst) }
+			explicit object(const uint32_t inst) : m_type { set_instruction_format(inst) }, m_data{ set_instruction_data(m_type, inst) }
 			{}
 
-			explicit object(uint32_t&& inst) : m_type{ set_instruction_format( std::move(inst) ) }, m_data{ set_instruction_data(m_type, std::move(inst)) }
-			{}
+			const type_identifier get_type() const;
+			const instruction_format get_data() const;
 		};
 
 		//Probably better (and faster) to generate an array filled with null spaces for potential instructions

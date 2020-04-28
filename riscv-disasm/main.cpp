@@ -2,10 +2,11 @@
 
 int main(int argc, char* argv[])
 {
-	uint32_t inst_test = 0xFCE08793;
+	std::vector<uint32_t> inst_test = { 0xFCE08793 };
+	riscv::instruction::object gay{ 0xFCE08793 };
 
-	riscv::instruction::object yeet(0xFCE08793);
-	riscv::instruction::object yeet2(inst_test);
+	riscv::disassembler disasm {inst_test};
 
+	disasm.parse_instructions();
 	return 0;
 }

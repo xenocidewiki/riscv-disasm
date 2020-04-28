@@ -1,5 +1,4 @@
 #include "instructions.hpp"
-#include <iostream>
 
 namespace riscv {
 	namespace instruction {
@@ -19,7 +18,7 @@ namespace riscv {
 			return opcode_instruction_type.at(opcode);
 		}
 
-		const object::instruction_format object::set_instruction(const type_identifier& type, const uint32_t& instruction)
+		const object::instruction_format object::set_instruction_data(const type_identifier& type, const uint32_t& instruction)
 		{	
 			switch(type)
 			{

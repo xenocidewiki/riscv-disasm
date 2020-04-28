@@ -140,6 +140,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="disassembler.cpp" />
     <ClCompile Include="elf.cpp" />
     <ClCompile Include="instruction.cpp" />
     <ClCompile Include="main.cpp" />
@@ -147,6 +148,7 @@
     <ClCompile Include="riscv.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="disassembler.hpp" />
     <ClInclude Include="elf.hpp" />
     <ClInclude Include="instructions.hpp" />
     <ClInclude Include="registers.hpp" />

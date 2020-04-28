@@ -36,6 +36,9 @@
     <ClCompile Include="instruction.cpp">
       <Filter>Source Files\riscv</Filter>
     </ClCompile>
+    <ClCompile Include="disassembler.cpp">
+      <Filter>Source Files\riscv</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="elf.hpp">
@@ -51,6 +54,9 @@
       <Filter>Header Files\riscv</Filter>
     </ClInclude>
     <ClInclude Include="registers.hpp">
+      <Filter>Header Files\riscv</Filter>
+    </ClInclude>
+    <ClInclude Include="disassembler.hpp">
       <Filter>Header Files\riscv</Filter>
     </ClInclude>
   </ItemGroup>

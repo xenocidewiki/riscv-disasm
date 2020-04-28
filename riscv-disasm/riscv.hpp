@@ -1,7 +1,6 @@
 #pragma once
 #include <cstdint>
-#include "instructions.hpp"
-#include "registers.hpp"
+#include "disassembler.hpp"
 
 namespace riscv
 {
@@ -12,9 +11,4 @@ namespace riscv
 		RV128
 	};
 
-	class disassembler
-	{
-	public:
-
-	};
 }

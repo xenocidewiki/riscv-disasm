@@ -112,17 +112,17 @@ namespace riscv
 
 			const uint8_t get_opcode(const uint32_t& instruction) const;
 			const type_identifier set_instruction_format(const uint32_t& instruction) const;
-			const instruction_format set_instruction(const type_identifier& type, const uint32_t& instruction);
+			const instruction_format set_instruction_data(const type_identifier& type, const uint32_t& instruction);
 
 		public:
 			object() = delete;
 			object(const object& obj) = delete;
 			object(object&& obj) = delete;
 
-			explicit object(const uint32_t& inst) : m_type { set_instruction_format(inst) }, m_data{ set_instruction(m_type, inst) }
+			explicit object(const uint32_t& inst) : m_type { set_instruction_format(inst) }, m_data{ set_instruction_data(m_type, inst) }
 			{}
 
-			explicit object(uint32_t&& inst) : m_type{ set_instruction_format( std::move(inst) ) }, m_data{ set_instruction(m_type, std::move(inst)) }
+			explicit object(uint32_t&& inst) : m_type{ set_instruction_format( std::move(inst) ) }, m_data{ set_instruction_data(m_type, std::move(inst)) }
 			{}
 		};
 

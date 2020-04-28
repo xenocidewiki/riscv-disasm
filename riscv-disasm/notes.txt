@@ -1,0 +1,7 @@
+* Type of instruction is opcode dependent -> can further simplify that way, parse it, and then do instruction detection
+
+Be careful with extensions, there is a lot of bullshit going on there
+>need unique parsing routines for that
+
+> Implement RV32I, RV64I, RV128I, Zifencei, Zicsr, Counters First, (PRIMARY FOCUS ON BASE INTEGER INSTRUCTIONS FIRST, AKA FIRST FOUR)
+> Then implement all the other extensions

@@ -1,6 +1,6 @@
 #include "disassembler.hpp"
 #include "registers.hpp"
-#include <variant>
+#include <iostream>
 
 namespace riscv
 {
@@ -62,7 +62,21 @@ namespace riscv
 
 	void disassembler::parse_instruction(const instruction::type_i& instruction)
 	{
-		return;
+		auto potential_instructions = instruction::instruction_table.at(instruction.opcode);
+
+		for (auto& instr_data : potential_instructions)
+		{
+			auto& [proper_opcode, mask, mnemonic] { instr_data };
+
+			if ((instruction.instruction & mask) == proper_opcode) {
+				auto& destination	= registers::x_reg_name_table[instruction.rd].second;
+				auto& source		= registers::x_reg_name_table[instruction.rs1].second;
+				auto& immediate		= instruction.imm;
+
+				std::cout << mnemonic << " " << destination << ", " << source << ", " << immediate;
+				return;
+			}
+		}
 	}
 
 	void disassembler::parse_instruction(const instruction::type_r& instruction)

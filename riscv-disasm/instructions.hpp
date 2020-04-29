@@ -159,7 +159,7 @@ namespace riscv
 						{ 0x4063, 0x707f, "BLT" }, 
 						{ 0x5063, 0x707f, "BGE" }, 
 						{ 0x6063, 0x707f, "BLTU" }, 
-						{ 0x7063, 0x707f, "BGEU" } 
+						{ 0x7063, 0x707f, "BGEU" }
 					} 
 			},
 

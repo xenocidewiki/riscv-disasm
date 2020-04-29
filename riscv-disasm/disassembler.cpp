@@ -69,11 +69,26 @@ namespace riscv
 			auto& [proper_opcode, mask, mnemonic] { instr_data };
 
 			if ((instruction.instruction & mask) == proper_opcode) {
-				auto& destination	= registers::x_reg_name_table[instruction.rd].second;
-				auto& source		= registers::x_reg_name_table[instruction.rs1].second;
-				auto& immediate		= instruction.imm;
+				auto& destination		= registers::x_reg_name_table[instruction.rd].second;
+				auto& source			= registers::x_reg_name_table[instruction.rs1].second;
+				signed int immediate	= instruction.imm;
 
-				std::cout << mnemonic << " " << destination << ", " << source << ", " << immediate << "\n";
+				//check for shamt instructions, can be done better but w/e, can refactor later
+				if (mnemonic == "SLLI" || mnemonic == "SLLIW" || mnemonic == "SRLI" || mnemonic == "SRLIW" || mnemonic == "SRAI" || mnemonic == "SRAIW") {
+					immediate = (immediate & 0x3F);
+				}
+
+				//Check for fence instructions, add handler l8r
+				if (mnemonic == "FENCE") {
+
+				}
+
+				if (mnemonic == "ECALL" || mnemonic == "EBREAK") {
+					std::cout << mnemonic << "\n";
+					return;
+				}
+
+				std::cout << mnemonic << " " << destination << ", " << source << ", 0x" << std::hex << immediate << "\n";
 				return;
 			}
 		}
@@ -81,7 +96,22 @@ namespace riscv
 
 	void disassembler::parse_instruction(const instruction::type_r& instruction)
 	{
+		auto potential_instructions = instruction::instruction_table.at(instruction.opcode);
 
+		for (auto& instr_data : potential_instructions)
+		{
+			auto& [proper_opcode, mask, mnemonic] { instr_data };
+
+			if ((instruction.instruction & mask) == proper_opcode) {
+				auto& destination	= registers::x_reg_name_table[instruction.rd].second;
+				auto& var_add_1		= registers::x_reg_name_table[instruction.rs1].second;
+				auto& var_add_2		= registers::x_reg_name_table[instruction.rs2].second;
+
+				std::cout << mnemonic << " " << destination << ", " << var_add_1 << ", " << var_add_2 << "\n";
+
+				return;
+			}
+		}
 	}
 
 	void disassembler::parse_instruction(const instruction::type_r4& instruction)
@@ -98,9 +128,9 @@ namespace riscv
 			auto& [proper_opcode, mask, mnemonic] { instr_data };
 
 			if ((instruction.instruction & mask) == proper_opcode) {
-				auto& destination = registers::x_reg_name_table[instruction.rs1].second;
-				auto& source = registers::x_reg_name_table[instruction.rs2].second;
-				signed int immediate = 0;
+				auto& destination		= registers::x_reg_name_table[instruction.rs1].second;
+				auto& source			= registers::x_reg_name_table[instruction.rs2].second;
+				signed int immediate	= 0;
 
 				//Might be wrong, make sure to double check....
 				immediate |= (instruction.imm_a << 11);
@@ -109,7 +139,7 @@ namespace riscv
 				immediate |= (instruction.imm_d << 12);
 
 				//Implement actual pc relative addressing later
-				std::cout << mnemonic << " " << destination << ", " << source << ", " << immediate << "(pc)\n";
+				std::cout << mnemonic << " " << destination << ", " << source << ", 0x" << std::hex << immediate << "(pc)\n";
 
 				return;
 			}
@@ -118,16 +148,62 @@ namespace riscv
 
 	void disassembler::parse_instruction(const instruction::type_u& instruction)
 	{
+		auto potential_instructions = instruction::instruction_table.at(instruction.opcode);
 
+		for (auto& instr_data : potential_instructions)
+		{
+			auto& [proper_opcode, mask, mnemonic] { instr_data };
+
+			if ((instruction.instruction & mask) == proper_opcode) {
+				auto& destination		= registers::x_reg_name_table[instruction.rd].second;
+				signed int immediate	= instruction.imm;
+
+				std::cout << mnemonic << " " << destination << ", 0x" << std::hex << immediate << "\n";
+			}
+		}
 	}
 
 	void disassembler::parse_instruction(const instruction::type_s& instruction)
 	{
+		auto potential_instructions = instruction::instruction_table.at(instruction.opcode);
 
+		for (auto& instr_data : potential_instructions)
+		{
+			auto& [proper_opcode, mask, mnemonic] { instr_data };
+
+			if ((instruction.instruction & mask) == proper_opcode) {
+				auto& destination		= registers::x_reg_name_table[instruction.rs2].second;
+				auto& source			= registers::x_reg_name_table[instruction.rs1].second;
+				signed int immediate	= 0;
+
+				immediate |= instruction.imm_a;
+				immediate |= (instruction.imm_b << 5);
+
+				std::cout << mnemonic << " " << destination << ", 0x" << std::hex << immediate << "(" << source << ")\n";
+			}
+		}
 	}
 
 	void disassembler::parse_instruction(const instruction::type_j& instruction)
 	{
+		auto potential_instructions = instruction::instruction_table.at(instruction.opcode);
 
+		for (auto& instr_data : potential_instructions)
+		{
+			auto& [proper_opcode, mask, mnemonic] { instr_data };
+
+			if ((instruction.instruction & mask) == proper_opcode) {
+				auto& destination = registers::x_reg_name_table[instruction.rd].second;
+				signed int immediate = 0;
+				
+				//double check
+				immediate |= (instruction.imm_a << 12);
+				immediate |= (instruction.imm_b << 11);
+				immediate |= (instruction.imm_c << 1);
+				immediate |= (instruction.imm_d << 20);
+
+				std::cout << mnemonic << " " << destination << ", 0x" << std::hex << immediate << "(pc)\n";
+			}
+		}
 	}
 }

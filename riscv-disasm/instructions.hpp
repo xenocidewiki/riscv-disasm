@@ -137,7 +137,7 @@ namespace riscv
 			{0x23, type_identifier::S},
 			{0x13, type_identifier::I}, //its a mutated I format! architecture dependent ;-; check x64 vs x86
 			{0x33, type_identifier::R},
-			{0x0F, type_identifier::I}, //Fence fucking instruction damnit, its either I, or its custom bullshit, FENCE.I is I, FENCE is garbo custom (its I but the fields are garbo)
+			{0x0F, type_identifier::I}, //Fence fucking instruction damnit, its either I, or its custom bullshit, FENCE.I is I, FENCE is garbo custom (its I but the fields are garbo) APPARENTLY THERE IS FENCE.TSO TOO?
 			{0x73, type_identifier::I}, //CSR or ECALL/EBREAK
 			{0x03, type_identifier::I},
 			{0x1B, type_identifier::I}, //modified I, uses shamt bs on 64bit

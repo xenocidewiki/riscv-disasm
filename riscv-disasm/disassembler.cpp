@@ -73,7 +73,7 @@ namespace riscv
 				auto& source		= registers::x_reg_name_table[instruction.rs1].second;
 				auto& immediate		= instruction.imm;
 
-				std::cout << mnemonic << " " << destination << ", " << source << ", " << immediate;
+				std::cout << mnemonic << " " << destination << ", " << source << ", " << immediate << "\n";
 				return;
 			}
 		}
@@ -91,7 +91,29 @@ namespace riscv
 
 	void disassembler::parse_instruction(const instruction::type_b& instruction)
 	{
+		auto potential_instructions = instruction::instruction_table.at(instruction.opcode);
 
+		for (auto& instr_data : potential_instructions)
+		{
+			auto& [proper_opcode, mask, mnemonic] { instr_data };
+
+			if ((instruction.instruction & mask) == proper_opcode) {
+				auto& destination = registers::x_reg_name_table[instruction.rs1].second;
+				auto& source = registers::x_reg_name_table[instruction.rs2].second;
+				signed int immediate = 0;
+
+				//Might be wrong, make sure to double check....
+				immediate |= (instruction.imm_a << 11);
+				immediate |= (instruction.imm_b << 1);
+				immediate |= (instruction.imm_c << 5);
+				immediate |= (instruction.imm_d << 12);
+
+				//Implement actual pc relative addressing later
+				std::cout << mnemonic << " " << destination << ", " << source << ", " << immediate << "(pc)\n";
+
+				return;
+			}
+		}
 	}
 
 	void disassembler::parse_instruction(const instruction::type_u& instruction)

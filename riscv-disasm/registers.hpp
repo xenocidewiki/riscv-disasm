@@ -21,7 +21,7 @@ namespace riscv
 			f24, f25, f26, f27, f28, f29, f30, f31
 		};
 
-		const std::array x_reg_name_table = {
+		std::array x_reg_name_table = {
 			std::pair{x_reg::x0, "zero"},
 			std::pair{x_reg::x1, "ra"},
 			std::pair{x_reg::x2, "sp"},
@@ -56,7 +56,7 @@ namespace riscv
 			std::pair{x_reg::x31, "t6"}
 		};
 
-		const std::array f_reg_name_table = {
+		std::array f_reg_name_table = {
 			std::pair{f_reg::f0, "ft0"},
 			std::pair{f_reg::f1, "ft1"},
 			std::pair{f_reg::f2, "ft2"},

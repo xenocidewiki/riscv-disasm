@@ -11,7 +11,13 @@ for line in lines:
     mnemonic_name = split[1].split("_")
      
     if i % 2 == 0:
-        mnemonic.append(mnemonic_name[1])
+        if len(mnemonic_name) == 4:
+            mnemonic.append(mnemonic_name[1] + "." + mnemonic_name[2] + "." + mnemonic_name[3])
+        elif len(mnemonic_name) == 3:
+            mnemonic.append(mnemonic_name[1] + "." + mnemonic_name[2])
+        else:
+            mnemonic.append(mnemonic_name[1])
+
         match.append(split[2].strip())
     else:
         mask.append(split[3].strip())

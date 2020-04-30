@@ -73,6 +73,12 @@ namespace riscv
 				auto& source			= registers::x_reg_name_table[instruction.rs1].second;
 				signed int immediate	= instruction.imm;
 
+				//Make better l8r
+				if (mnemonic == "FLW" || mnemonic == "FLD" || mnemonic == "FLQ") {
+					destination = registers::f_reg_name_table[instruction.rd].second;
+					source		= registers::f_reg_name_table[instruction.rs1].second;
+				}
+
 				//check for shamt instructions, can be done better but w/e, can refactor later
 				if (mnemonic == "SLLI" || mnemonic == "SLLIW" || mnemonic == "SRLI" || mnemonic == "SRLIW" || mnemonic == "SRAI" || mnemonic == "SRAIW")
 						immediate = (immediate & 0x3F); //This handles both the RV64I and RV32I case, note that this is 000000111111, this will pull out the shamt correctly for both, look in manual
@@ -277,6 +283,9 @@ namespace riscv
 			if ((instruction.instruction & mask) == proper_opcode) {
 				auto& destination = registers::x_reg_name_table[instruction.rd].second;
 				signed int immediate = 0;
+
+				if (mnemonic == "FSW" || mnemonic == "FSD" || mnemonic == "FSQ")
+					destination = registers::f_reg_name_table[instruction.rd].second;
 				
 				//double check
 				immediate |= (instruction.imm_a << 12);

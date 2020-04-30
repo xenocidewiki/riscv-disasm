@@ -154,7 +154,16 @@ namespace riscv
 			{0x03, type_identifier::I},
 			{0x1B, type_identifier::I}, //modified I, uses shamt bs on 64bit
 			{0x3B, type_identifier::R},
-			{0x2F, type_identifier::R} //RV32/64A extension
+			{0x2F, type_identifier::R}, //RV32/64A extension
+
+			//RV(32/64)(F/D/Q) Extensions
+			{0x07, type_identifier::I}, //FLW/FLD/FLQ
+			{0x27, type_identifier::S}, //FSW/FSD/FSQ
+			{0x43, type_identifier::R4}, //FMADD.S/D/Q
+			{0x47, type_identifier::R4}, //FMSUB.S/D/Q
+			{0x4B, type_identifier::R4}, //FNMSUB.S/D/Q
+			{0x4F, type_identifier::R4}, //FNMADD.S/D/Q
+			{0x53, type_identifier::R} //Everything else
 		};
 
 		/*
@@ -329,8 +338,59 @@ namespace riscv
 						{ 0x1000302f, 0xf9f0707f, "LR.D"}, 
 						{ 0x1800302f, 0xf800707f, "SC.D"}
 					} 
-			}
+			},
+
+			//RV(32/64)(F/D/Q) Extensions
+			{ 0x07, {} }, 
+
+			{ 0x27, {} },
+
+			{ 0x43, {} },
+
+			{ 0x47, {} },
+
+			{ 0x4B, {} }, 
+
+			{ 0x4F, {} }, 
+
+			{ 0x53, {} } 
 		};
 	}
 }
 
+//F
+/*
+{ 0x53, { {0x53, 0xfe00007f, "FADD.S" }, { 0x8000053, 0xfe00007f, "FSUB.S" }, { 0x10000053, 0xfe00007f, "FMUL.S" }, { 0x18000053, 0xfe00007f, "FDIV.S" }, { 0x20000053, 0xfe00707f, "FSGNJ.S" }, { 0x20001053, 0xfe00707f, "FSGNJN.S" }, { 0x20002053, 0xfe00707f, "FSGNJX.S" }, { 0x28000053, 0xfe00707f, "FMIN.S" }, { 0x28001053, 0xfe00707f, "FMAX.S" }, { 0x58000053, 0xfff0007f, "FSQRT.S" }, { 0xa0000053, 0xfe00707f, "FLE.S" }, { 0xa0001053, 0xfe00707f, "FLT.S" }, { 0xa0002053, 0xfe00707f, "FEQ.S" }, { 0xc0000053, 0xfff0007f, "FCVT.W.S" }, { 0xc0100053, 0xfff0007f, "FCVT.WU.S" }, { 0xe0000053, 0xfff0707f, "FMV.X.W" }, { 0xe0001053, 0xfff0707f, "FCLASS.S" }, { 0xd0000053, 0xfff0007f, "FCVT.S.W" }, { 0xd0100053, 0xfff0007f, "FCVT.S.WU" }, { 0xf0000053, 0xfff0707f, "FMV.W.X" } } },
+{ 0x7, { {0x2007, 0x707f, "FLW" } } },
+{ 0x27, { {0x2027, 0x707f, "FSW" } } },
+{ 0x43, { {0x43, 0x600007f, "FMADD.S" } } },
+{ 0x47, { {0x47, 0x600007f, "FMSUB.S" } } },
+{ 0x4b, { {0x4b, 0x600007f, "FNMSUB.S" } } },
+{ 0x4f, { {0x4f, 0x600007f, "FNMADD.S" } } },
+{ 0x53, { {0xc0200053, 0xfff0007f, "FCVT.L.S" }, { 0xc0300053, 0xfff0007f, "FCVT.LU.S" }, { 0xd0200053, 0xfff0007f, "FCVT.S.L" }, { 0xd0300053, 0xfff0007f, "FCVT.S.LU" }
+*/
+
+
+//D
+/*
+{ 0x53, { {0x2000053, 0xfe00007f, "FADD.D" }, { 0xa000053, 0xfe00007f, "FSUB.D" }, { 0x12000053, 0xfe00007f, "FMUL.D" }, { 0x1a000053, 0xfe00007f, "FDIV.D" }, { 0x22000053, 0xfe00707f, "FSGNJ.D" }, { 0x22001053, 0xfe00707f, "FSGNJN.D" }, { 0x22002053, 0xfe00707f, "FSGNJX.D" }, { 0x2a000053, 0xfe00707f, "FMIN.D" }, { 0x2a001053, 0xfe00707f, "FMAX.D" }, { 0x40100053, 0xfff0007f, "FCVT.S.D" }, { 0x42000053, 0xfff0007f, "FCVT.D.S" }, { 0x5a000053, 0xfff0007f, "FSQRT.D" }, { 0xa2000053, 0xfe00707f, "FLE.D" }, { 0xa2001053, 0xfe00707f, "FLT.D" }, { 0xa2002053, 0xfe00707f, "FEQ.D" }, { 0xc2000053, 0xfff0007f, "FCVT.W.D" }, { 0xc2100053, 0xfff0007f, "FCVT.WU.D" }, { 0xe2001053, 0xfff0707f, "FCLASS.D" }, { 0xd2000053, 0xfff0007f, "FCVT.D.W" }, { 0xd2100053, 0xfff0007f, "FCVT.D.WU" } } },
+{ 0x7, { {0x3007, 0x707f, "FLD" } } },
+{ 0x27, { {0x3027, 0x707f, "FSD" } } },
+{ 0x43, { {0x2000043, 0x600007f, "FMADD.D" } } },
+{ 0x47, { {0x2000047, 0x600007f, "FMSUB.D" } } },
+{ 0x4b, { {0x200004b, 0x600007f, "FNMSUB.D" } } },
+{ 0x4f, { {0x200004f, 0x600007f, "FNMADD.D" } } },
+{ 0x53, { {0xc2200053, 0xfff0007f, "FCVT.L.D" }, { 0xc2300053, 0xfff0007f, "FCVT.LU.D" }, { 0xe2000053, 0xfff0707f, "FMV.X.D" }, { 0xd2200053, 0xfff0007f, "FCVT.D.L" }, { 0xd2300053, 0xfff0007f, "FCVT.D.LU" }, { 0xf2000053, 0xfff0707f, "FMV.D.X" }
+*/
+
+//Q
+/*
+{ 0x53, { {0x6000053, 0xfe00007f, "FADD.Q" }, { 0xe000053, 0xfe00007f, "FSUB.Q" }, { 0x16000053, 0xfe00007f, "FMUL.Q" }, { 0x1e000053, 0xfe00007f, "FDIV.Q" }, { 0x26000053, 0xfe00707f, "FSGNJ.Q" }, { 0x26001053, 0xfe00707f, "FSGNJN.Q" }, { 0x26002053, 0xfe00707f, "FSGNJX.Q" }, { 0x2e000053, 0xfe00707f, "FMIN.Q" }, { 0x2e001053, 0xfe00707f, "FMAX.Q" }, { 0x40300053, 0xfff0007f, "FCVT.S.Q" }, { 0x46000053, 0xfff0007f, "FCVT.Q.S" }, { 0x42300053, 0xfff0007f, "FCVT.D.Q" }, { 0x46100053, 0xfff0007f, "FCVT.Q.D" }, { 0x5e000053, 0xfff0007f, "FSQRT.Q" }, { 0xa6000053, 0xfe00707f, "FLE.Q" }, { 0xa6001053, 0xfe00707f, "FLT.Q" }, { 0xa6002053, 0xfe00707f, "FEQ.Q" }, { 0xc6000053, 0xfff0007f, "FCVT.W.Q" }, { 0xc6100053, 0xfff0007f, "FCVT.WU.Q" }, { 0xe6001053, 0xfff0707f, "FCLASS.Q" }, { 0xd6000053, 0xfff0007f, "FCVT.Q.W" }, { 0xd6100053, 0xfff0007f, "FCVT.Q.WU" } } },
+{ 0x7, { {0x4007, 0x707f, "FLQ" } } },
+{ 0x27, { {0x4027, 0x707f, "FSQ" } } },
+{ 0x43, { {0x6000043, 0x600007f, "FMADD.Q" } } },
+{ 0x47, { {0x6000047, 0x600007f, "FMSUB.Q" } } },
+{ 0x4b, { {0x600004b, 0x600007f, "FNMSUB.Q" } } },
+{ 0x4f, { {0x600004f, 0x600007f, "FNMADD.Q" } } },
+{ 0x53, { {0xc6200053, 0xfff0007f, "FCVT.L.Q" }, { 0xc6300053, 0xfff0007f, "FCVT.LU.Q" }, { 0xd6200053, 0xfff0007f, "FCVT.Q.L" }, { 0xd6300053, 0xfff0007f, "FCVT.Q.LU" }
+*/

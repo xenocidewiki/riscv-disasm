@@ -74,13 +74,57 @@ namespace riscv
 				signed int immediate	= instruction.imm;
 
 				//check for shamt instructions, can be done better but w/e, can refactor later
-				if (mnemonic == "SLLI" || mnemonic == "SLLIW" || mnemonic == "SRLI" || mnemonic == "SRLIW" || mnemonic == "SRAI" || mnemonic == "SRAIW") {
+				if (mnemonic == "SLLI" || mnemonic == "SLLIW" || mnemonic == "SRLI" || mnemonic == "SRLIW" || mnemonic == "SRAI" || mnemonic == "SRAIW")
 					immediate = (immediate & 0x3F);
-				}
 
 				//Check for fence instructions, add handler l8r
 				if (mnemonic == "FENCE") {
+					//FENCE.TSO
+					if (immediate >> 8) {
+						std::cout << "FENCE.TSO rw, rw\n";
+						return;
+					}
 
+					//For the love of god move all of this to another function
+					union iorw
+					{
+						int encoding;
+						struct {
+							int8_t w : 1;
+							int8_t r : 1;
+							int8_t o : 1;
+							int8_t i : 1;
+							int8_t pad : 4;
+						};
+					};
+
+					auto successor   = iorw{ immediate & 0x0f };
+					auto predecessor = iorw{ (immediate & 0b000011110000) >> 4 };
+
+					std::string succ_str;
+					std::string pre_str;
+
+					if (successor.i != 0)
+						succ_str.append("i");
+					if (successor.o != 0)
+						succ_str.append("o");
+					if (successor.r != 0)
+						succ_str.append("r");
+					if (successor.w != 0)
+						succ_str.append("w");
+
+					if (predecessor.i != 0)
+						pre_str.append("i");
+					if (predecessor.o != 0)
+						pre_str.append("o");
+					if (predecessor.r != 0)
+						pre_str.append("r");
+					if (predecessor.w != 0)
+						pre_str.append("w");
+
+					
+					std::cout << mnemonic << " " << pre_str << ", " << succ_str << "\n";
+					return;
 				}
 
 				if (mnemonic == "ECALL" || mnemonic == "EBREAK") {

@@ -4,11 +4,4 @@
 
 namespace riscv
 {
-	enum isa
-	{
-		RV32,
-		RV64,
-		RV128
-	};
-
 }

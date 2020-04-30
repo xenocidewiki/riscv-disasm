@@ -13,6 +13,18 @@ namespace riscv
 			R, R4, I, S, B, U, J
 		};
 
+		enum class extensions
+		{
+			I,
+			ZIFENCEI,
+			ZICSR,
+			M,
+			A,
+			F,
+			D,
+			Q
+		};
+
 		union type_r {
 			uint32_t instruction;
 			struct
@@ -141,7 +153,8 @@ namespace riscv
 			{0x73, type_identifier::I}, //CSR or ECALL/EBREAK
 			{0x03, type_identifier::I},
 			{0x1B, type_identifier::I}, //modified I, uses shamt bs on 64bit
-			{0x3B, type_identifier::R}
+			{0x3B, type_identifier::R},
+			{0x2F, type_identifier::R} //RV32/64A extension
 		};
 
 		/*
@@ -206,7 +219,17 @@ namespace riscv
 						{ 0x5033, 0xfe00707f, "SRL" }, 
 						{ 0x40005033, 0xfe00707f, "SRA" }, 
 						{ 0x6033, 0xfe00707f, "OR" }, 
-						{ 0x7033, 0xfe00707f, "AND" } 
+						{ 0x7033, 0xfe00707f, "AND" },
+
+						//RV32M Extension
+						{ 0x2000033, 0xfe00707f, "MUL" }, 
+						{ 0x2001033, 0xfe00707f, "MULH" }, 
+						{ 0x2002033, 0xfe00707f, "MULHSU" }, 
+						{ 0x2003033, 0xfe00707f, "MULHU" }, 
+						{ 0x2004033, 0xfe00707f, "DIV" }, 
+						{ 0x2005033, 0xfe00707f, "DIVU" }, 
+						{ 0x2006033, 0xfe00707f, "REM" }, 
+						{ 0x2007033, 0xfe00707f, "REMU" }
 					} 
 			},
 
@@ -268,9 +291,46 @@ namespace riscv
 						{ 0x4000003b, 0xfe00707f, "SUBW" }, 
 						{ 0x103b, 0xfe00707f, "SLLW" }, 
 						{ 0x503b, 0xfe00707f, "SRLW" }, 
-						{ 0x4000503b, 0xfe00707f, "SRAW" } 
+						{ 0x4000503b, 0xfe00707f, "SRAW" }, 
+
+						//RV64M Extension
+						{ 0x200003b, 0xfe00707f, "MULW" }, 
+						{ 0x200403b, 0xfe00707f, "DIVW" }, 
+						{ 0x200503b, 0xfe00707f, "DIVUW" }, 
+						{ 0x200603b, 0xfe00707f, "REMW" }, 
+						{ 0x200703b, 0xfe00707f, "REMUW" }
+					} 
+			},
+
+			{ 0x2f, {
+						//RV32A Extension
+						{ 0x202f, 0xf800707f, "AMOADD.W"}, 
+						{ 0x2000202f, 0xf800707f, "AMOXOR.W"}, 
+						{ 0x4000202f, 0xf800707f, "AMOOR.W"}, 
+						{ 0x6000202f, 0xf800707f, "AMOAND.W"}, 
+						{ 0x8000202f, 0xf800707f, "AMOMIN.W"}, 
+						{ 0xa000202f, 0xf800707f, "AMOMAX.W"}, 
+						{ 0xc000202f, 0xf800707f, "AMOMINU.W"}, 
+						{ 0xe000202f, 0xf800707f, "AMOMAXU.W"}, 
+						{ 0x800202f, 0xf800707f, "AMOSWAP.W"}, 
+						{ 0x1000202f, 0xf9f0707f, "LR.W"}, 
+						{ 0x1800202f, 0xf800707f, "SC.W"},
+
+						//RV64A Extension
+						{ 0x302f, 0xf800707f, "AMOADD.D"}, 
+						{ 0x2000302f, 0xf800707f, "AMOXOR.D"},
+						{ 0x4000302f, 0xf800707f, "AMOOR.D"}, 
+						{ 0x6000302f, 0xf800707f, "AMOAND.D"}, 
+						{ 0x8000302f, 0xf800707f, "AMOMIN.D"}, 
+						{ 0xa000302f, 0xf800707f, "AMOMAX.D"}, 
+						{ 0xc000302f, 0xf800707f, "AMOMINU.D"}, 
+						{ 0xe000302f, 0xf800707f, "AMOMAXU.D"}, 
+						{ 0x800302f, 0xf800707f, "AMOSWAP.D"}, 
+						{ 0x1000302f, 0xf9f0707f, "LR.D"}, 
+						{ 0x1800302f, 0xf800707f, "SC.D"}
 					} 
 			}
 		};
 	}
 }
+

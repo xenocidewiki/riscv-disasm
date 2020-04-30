@@ -75,9 +75,13 @@ namespace riscv
 
 				//check for shamt instructions, can be done better but w/e, can refactor later
 				if (mnemonic == "SLLI" || mnemonic == "SLLIW" || mnemonic == "SRLI" || mnemonic == "SRLIW" || mnemonic == "SRAI" || mnemonic == "SRAIW")
-					immediate = (immediate & 0x3F);
+						immediate = (immediate & 0x3F); //This handles both the RV64I and RV32I case, note that this is 000000111111, this will pull out the shamt correctly for both, look in manual
 
-				//Check for fence instructions, add handler l8r
+				if (mnemonic == "FENCE.I") {
+					std::cout << mnemonic << "\n";
+					return;
+				}
+
 				if (mnemonic == "FENCE") {
 					//FENCE.TSO
 					if (immediate >> 8) {
@@ -132,6 +136,14 @@ namespace riscv
 					return;
 				}
 
+				//double check this, these are CSR setting instructions that use rs1 as an immediate rather than register
+				if (mnemonic == "CSRRWI" || mnemonic == "CSRRSI" || mnemonic == "CSRRCI") {
+					uint8_t csr_source = instruction.rs1;
+
+					std::cout << mnemonic << " " << destination << ", 0x" << std::hex << csr_source << ", 0x" << immediate << "\n";
+					return;
+				}
+
 				std::cout << mnemonic << " " << destination << ", " << source << ", 0x" << std::hex << immediate << "\n";
 				return;
 			}
@@ -147,11 +159,37 @@ namespace riscv
 			auto& [proper_opcode, mask, mnemonic] { instr_data };
 
 			if ((instruction.instruction & mask) == proper_opcode) {
-				auto& destination	= registers::x_reg_name_table[instruction.rd].second;
-				auto& var_add_1		= registers::x_reg_name_table[instruction.rs1].second;
-				auto& var_add_2		= registers::x_reg_name_table[instruction.rs2].second;
 
-				std::cout << mnemonic << " " << destination << ", " << var_add_1 << ", " << var_add_2 << "\n";
+				//A extension checks, make this a function l8r 
+				if (instruction.opcode == 0x2F) {
+					auto& destination	= registers::x_reg_name_table[instruction.rd].second;
+					auto& address		= registers::x_reg_name_table[instruction.rs1].second;
+					auto& middle		= registers::x_reg_name_table[instruction.rs2].second;
+
+					std::string aq_rl{};
+
+					uint8_t aq = instruction.funct7 & 0b0000010;
+					uint8_t rl = instruction.funct7 & 0b0000001;
+
+					if (aq)
+						aq_rl.append(".AQ");
+					if (rl)
+						aq_rl.append(".RL");
+
+					if (mnemonic == "LR.W" || mnemonic == "LR.D") {
+						std::cout << mnemonic << aq_rl << " " << destination << ", (" << address << ")\n";
+						return;
+					}
+
+					std::cout << mnemonic << aq_rl << " " << destination << ", " << middle << ", (" << address << ")\n";
+					return;
+				}
+
+				auto& destination	= registers::x_reg_name_table[instruction.rd].second;
+				auto& middle		= registers::x_reg_name_table[instruction.rs1].second;
+				auto& last		= registers::x_reg_name_table[instruction.rs2].second;
+
+				std::cout << mnemonic << " " << destination << ", " << middle << ", " << last << "\n";
 
 				return;
 			}

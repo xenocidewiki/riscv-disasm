@@ -3,5 +3,4 @@
 Be careful with extensions, there is a lot of bullshit going on there
 >need unique parsing routines for that
 
-> Implement RV32I, RV64I, RV128I, Zifencei, Zicsr, Counters First, (PRIMARY FOCUS ON BASE INTEGER INSTRUCTIONS FIRST, AKA FIRST FOUR)
-> Then implement all the other extensions
+>After imlpementing all available extensions provided by hte manual, look into working with compressed instructions (See "C" extension in the manual)

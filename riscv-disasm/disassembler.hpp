@@ -2,9 +2,17 @@
 #include "instructions.hpp"
 
 namespace riscv {
+	enum class isa
+	{
+		RV32,
+		RV64,
+		RV128
+	};
+
 	class disassembler
 	{
 		std::vector<instruction::object> m_instructions;
+		isa m_architecture;
 
 		void parse_instruction(const instruction::type_i& instruction);
 		void parse_instruction(const instruction::type_r& instruction);
@@ -23,10 +31,10 @@ namespace riscv {
 		disassembler(const disassembler& disasm) = delete;
 		disassembler(disassembler&& disasm) = delete;
 
-		disassembler(const std::vector<uint32_t>& code) : m_instructions{ get_instructions(code) }
+		disassembler(const std::vector<uint32_t>& code, const isa arch) : m_instructions{ get_instructions(code) }, m_architecture{ arch }
 		{}
 
-		disassembler(std::vector<uint32_t>&& code) : m_instructions{ get_instructions(std::move(code)) }
+		disassembler(std::vector<uint32_t>&& code, const isa arch) : m_instructions{ get_instructions(std::move(code)) }, m_architecture{ arch }
 		{}
 
 		void parse_instructions();

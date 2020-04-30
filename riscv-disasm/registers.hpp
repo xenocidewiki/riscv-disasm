@@ -56,7 +56,7 @@ namespace riscv
 			std::pair{x_reg::x31, "t6"}
 		};
 
-		std::array f_reg_name_table = {
+		const std::array f_reg_name_table = {
 			std::pair{f_reg::f0, "ft0"},
 			std::pair{f_reg::f1, "ft1"},
 			std::pair{f_reg::f2, "ft2"},

@@ -66,7 +66,7 @@ namespace riscv
 
 		for (auto& instr_data : potential_instructions)
 		{
-			auto& [proper_opcode, mask, mnemonic] { instr_data };
+			auto& [proper_opcode, mask, mnemonic, is_store_or_load, is_floating_point] { instr_data };
 
 			if ((instruction.instruction & mask) == proper_opcode) {
 				auto& destination		= registers::x_reg_name_table[instruction.rd].second;
@@ -74,7 +74,7 @@ namespace riscv
 				signed int immediate	= instruction.imm;
 
 				//Make better l8r
-				if (mnemonic == "FLW" || mnemonic == "FLD" || mnemonic == "FLQ") {
+				if (is_floating_point) {
 					destination = registers::f_reg_name_table[instruction.rd].second;
 					source		= registers::f_reg_name_table[instruction.rs1].second;
 				}
@@ -162,7 +162,7 @@ namespace riscv
 
 		for (auto& instr_data : potential_instructions)
 		{
-			auto& [proper_opcode, mask, mnemonic] { instr_data };
+			auto& [proper_opcode, mask, mnemonic, is_store_or_load, is_floating_point] { instr_data };
 
 			if ((instruction.instruction & mask) == proper_opcode) {
 
@@ -213,7 +213,7 @@ namespace riscv
 
 		for (auto& instr_data : potential_instructions)
 		{
-			auto& [proper_opcode, mask, mnemonic] { instr_data };
+			auto& [proper_opcode, mask, mnemonic, is_store_or_load, is_floating_point] { instr_data };
 
 			if ((instruction.instruction & mask) == proper_opcode) {
 				auto& destination		= registers::x_reg_name_table[instruction.rs1].second;
@@ -240,7 +240,7 @@ namespace riscv
 
 		for (auto& instr_data : potential_instructions)
 		{
-			auto& [proper_opcode, mask, mnemonic] { instr_data };
+			auto& [proper_opcode, mask, mnemonic, is_store_or_load, is_floating_point] { instr_data };
 
 			if ((instruction.instruction & mask) == proper_opcode) {
 				auto& destination		= registers::x_reg_name_table[instruction.rd].second;
@@ -257,7 +257,7 @@ namespace riscv
 
 		for (auto& instr_data : potential_instructions)
 		{
-			auto& [proper_opcode, mask, mnemonic] { instr_data };
+			auto& [proper_opcode, mask, mnemonic, is_store_or_load, is_floating_point] { instr_data };
 
 			if ((instruction.instruction & mask) == proper_opcode) {
 				auto& destination		= registers::x_reg_name_table[instruction.rs2].second;
@@ -278,13 +278,13 @@ namespace riscv
 
 		for (auto& instr_data : potential_instructions)
 		{
-			auto& [proper_opcode, mask, mnemonic] { instr_data };
+			auto& [proper_opcode, mask, mnemonic, is_store_or_load, is_floating_point] { instr_data };
 
 			if ((instruction.instruction & mask) == proper_opcode) {
 				auto& destination = registers::x_reg_name_table[instruction.rd].second;
 				signed int immediate = 0;
 
-				if (mnemonic == "FSW" || mnemonic == "FSD" || mnemonic == "FSQ")
+				if (is_floating_point)
 					destination = registers::f_reg_name_table[instruction.rd].second;
 				
 				//double check

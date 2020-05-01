@@ -1,3 +1,18 @@
+//	Copyright(C) 2020 xenocidewiki
+//	This file is part of riscv-disasm.
+//
+//	riscv-disasm is free software : you can redistribute it and /or modify
+//	it under the terms of the GNU General Public License as published by
+//	the Free Software Foundation, either version 3 of the License, or
+//	(at your option) any later version.
+//
+//	riscv-disasm is distributed in the hope that it will be useful,
+//	but WITHOUT ANY WARRANTY; without even the implied warranty of
+//	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//	GNU General Public License for more details.
+//
+//	You should have received a copy of the GNU General Public License
+//	along with riscv-disasm. If not, see <https://www.gnu.org/licenses/>.
 #include "disassembler.hpp"
 #include "registers.hpp"
 #include <iostream>
@@ -60,10 +75,10 @@ namespace riscv
 	{
 		auto& [proper_opcode, mask, mnemonic, flags] { instr_data };
 
-		auto& destination = registers::f_reg_name_table[instruction.rd].second;
-		auto& first = registers::f_reg_name_table[instruction.rs1].second;
-		auto& last = registers::f_reg_name_table[instruction.rs2].second;
-		auto& mode = instruction::float_rounding_name[instruction.funct3].second;
+		auto& destination	= registers::f_reg_name_table[instruction.rd].second;
+		auto& first			= registers::f_reg_name_table[instruction.rs1].second;
+		auto& last			= registers::f_reg_name_table[instruction.rs2].second;
+		auto& mode			= instruction::float_rounding_name[instruction.funct3].second;
 
 		if (flags.is_special_float) {
 			std::cout << mnemonic << "(" << mode << ") " << destination << ", " << first << "\n";

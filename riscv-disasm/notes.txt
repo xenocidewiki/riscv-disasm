@@ -6,3 +6,4 @@ Be careful with extensions, there is a lot of bullshit going on there
 >After imlpementing all available extensions provided by hte manual, look into working with compressed instructions (See "C" extension in the manual)
 >Need to fix load instructions to do load a, offset(b) instead of load a, b, offset
 >Fix use of rs1 and rs2 in S-type instructions
+make an opcode enum, to give opcodes names, which would be useful yknow, esp in large tables i have

@@ -39,6 +39,9 @@
     <ClCompile Include="disassembler.cpp">
       <Filter>Source Files\riscv</Filter>
     </ClCompile>
+    <ClCompile Include="instruction_handlers.cpp">
+      <Filter>Source Files\riscv</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="elf.hpp">

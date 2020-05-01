@@ -66,89 +66,41 @@ namespace riscv
 
 		for (auto& instr_data : potential_instructions)
 		{
-			auto& [proper_opcode, mask, mnemonic, is_store_or_load, is_floating_point] { instr_data };
+			auto& [proper_opcode, mask, mnemonic, flags] { instr_data };
 
 			if ((instruction.instruction & mask) == proper_opcode) {
 				auto& destination		= registers::x_reg_name_table[instruction.rd].second;
 				auto& source			= registers::x_reg_name_table[instruction.rs1].second;
 				signed int immediate	= instruction.imm;
 
-				//Make better l8r
-				if (is_floating_point) {
-					destination = registers::f_reg_name_table[instruction.rd].second;
-					source		= registers::f_reg_name_table[instruction.rs1].second;
-				}
-
-				//check for shamt instructions, can be done better but w/e, can refactor later
-				if (mnemonic == "SLLI" || mnemonic == "SLLIW" || mnemonic == "SRLI" || mnemonic == "SRLIW" || mnemonic == "SRAI" || mnemonic == "SRAIW")
-						immediate = (immediate & 0x3F); //This handles both the RV64I and RV32I case, note that this is 000000111111, this will pull out the shamt correctly for both, look in manual
-
-				if (mnemonic == "FENCE.I") {
-					std::cout << mnemonic << "\n";
+				if (flags.is_fence) {
+					fence_instruction_handler(mnemonic, immediate);
 					return;
 				}
 
-				if (mnemonic == "FENCE") {
-					//FENCE.TSO
-					if (immediate >> 8) {
-						std::cout << "FENCE.TSO rw, rw\n";
-						return;
-					}
-
-					//For the love of god move all of this to another function
-					union iorw
-					{
-						int encoding;
-						struct {
-							int8_t w : 1;
-							int8_t r : 1;
-							int8_t o : 1;
-							int8_t i : 1;
-							int8_t pad : 4;
-						};
-					};
-
-					auto successor   = iorw{ immediate & 0x0f };
-					auto predecessor = iorw{ (immediate & 0b000011110000) >> 4 };
-
-					std::string succ_str;
-					std::string pre_str;
-
-					if (successor.i != 0)
-						succ_str.append("i");
-					if (successor.o != 0)
-						succ_str.append("o");
-					if (successor.r != 0)
-						succ_str.append("r");
-					if (successor.w != 0)
-						succ_str.append("w");
-
-					if (predecessor.i != 0)
-						pre_str.append("i");
-					if (predecessor.o != 0)
-						pre_str.append("o");
-					if (predecessor.r != 0)
-						pre_str.append("r");
-					if (predecessor.w != 0)
-						pre_str.append("w");
-
-					
-					std::cout << mnemonic << " " << pre_str << ", " << succ_str << "\n";
-					return;
-				}
-
-				if (mnemonic == "ECALL" || mnemonic == "EBREAK") {
+				if (flags.is_e_sys) {
 					std::cout << mnemonic << "\n";
 					return;
 				}
 
 				//double check this, these are CSR setting instructions that use rs1 as an immediate rather than register
-				if (mnemonic == "CSRRWI" || mnemonic == "CSRRSI" || mnemonic == "CSRRCI") {
+				//do we need to make a function for this or eh? (seems wasteful)
+				if (flags.is_imm_csr) {
 					uint8_t csr_source = instruction.rs1;
 
 					std::cout << mnemonic << " " << destination << ", 0x" << std::hex << csr_source << ", 0x" << immediate << "\n";
 					return;
 				}
+
+				//Make better l8r
+				if (flags.is_float) {
+					destination = registers::f_reg_name_table[instruction.rd].second;
+					source		= registers::f_reg_name_table[instruction.rs1].second;
+				}
+
+				//check for shamt instructions
+				if (flags.is_shamt)
+					immediate = (immediate & 0x3F); //This handles both the RV64I and RV32I case, note that this is 000000111111, this will pull out the shamt correctly for both, look in manual
 
 				std::cout << mnemonic << " " << destination << ", " << source << ", 0x" << std::hex << immediate << "\n";
 				return;
@@ -162,38 +114,24 @@ namespace riscv
 
 		for (auto& instr_data : potential_instructions)
 		{
-			auto& [proper_opcode, mask, mnemonic, is_store_or_load, is_floating_point] { instr_data };
+			auto& [proper_opcode, mask, mnemonic, flags] { instr_data };
 
 			if ((instruction.instruction & mask) == proper_opcode) {
 
-				//A extension checks, make this a function l8r 
-				if (instruction.opcode == 0x2F) {
-					auto& destination	= registers::x_reg_name_table[instruction.rd].second;
-					auto& address		= registers::x_reg_name_table[instruction.rs1].second;
-					auto& middle		= registers::x_reg_name_table[instruction.rs2].second;
+				//A extension checks
+				if (flags.is_a_ext) {
+					a_ext_instruction_handler(instruction, instr_data);
+					return;
+				}
 
-					std::string aq_rl{};
-
-					uint8_t aq = instruction.funct7 & 0b0000010;
-					uint8_t rl = instruction.funct7 & 0b0000001;
-
-					if (aq)
-						aq_rl.append(".AQ");
-					if (rl)
-						aq_rl.append(".RL");
-
-					if (mnemonic == "LR.W" || mnemonic == "LR.D") {
-						std::cout << mnemonic << aq_rl << " " << destination << ", (" << address << ")\n";
-						return;
-					}
-
-					std::cout << mnemonic << aq_rl << " " << destination << ", " << middle << ", (" << address << ")\n";
+				if (flags.is_float) {
+					float_instruction_handler(instruction, instr_data);
 					return;
 				}
 
 				auto& destination	= registers::x_reg_name_table[instruction.rd].second;
 				auto& middle		= registers::x_reg_name_table[instruction.rs1].second;
-				auto& last		= registers::x_reg_name_table[instruction.rs2].second;
+				auto& last			= registers::x_reg_name_table[instruction.rs2].second;
 
 				std::cout << mnemonic << " " << destination << ", " << middle << ", " << last << "\n";
 
@@ -204,7 +142,24 @@ namespace riscv
 
 	void disassembler::parse_instruction(const instruction::type_r4& instruction)
 	{
+		auto potential_instructions = instruction::instruction_table.at(instruction.opcode);
 
+		for (auto& instr_data : potential_instructions)
+		{
+			auto& [proper_opcode, mask, mnemonic, flags] { instr_data };
+
+			if ((instruction.instruction & mask) == proper_opcode) {
+				auto& destination	= registers::f_reg_name_table[instruction.rd].second;
+				auto& first			= registers::f_reg_name_table[instruction.rs1].second;
+				auto& middle		= registers::f_reg_name_table[instruction.rs2].second;
+				auto& last			= registers::f_reg_name_table[instruction.rs3].second;
+				auto& mode			= instruction::float_rounding_name[instruction.funct3].second;
+
+				std::cout << mnemonic << "(" << mode << ") " << destination << ", " << first << ", " << middle << ", " << last << "\n";
+
+				return;
+			}
+		}
 	}
 
 	void disassembler::parse_instruction(const instruction::type_b& instruction)
@@ -213,7 +168,7 @@ namespace riscv
 
 		for (auto& instr_data : potential_instructions)
 		{
-			auto& [proper_opcode, mask, mnemonic, is_store_or_load, is_floating_point] { instr_data };
+			auto& [proper_opcode, mask, mnemonic, flags] { instr_data };
 
 			if ((instruction.instruction & mask) == proper_opcode) {
 				auto& destination		= registers::x_reg_name_table[instruction.rs1].second;
@@ -240,7 +195,7 @@ namespace riscv
 
 		for (auto& instr_data : potential_instructions)
 		{
-			auto& [proper_opcode, mask, mnemonic, is_store_or_load, is_floating_point] { instr_data };
+			auto& [proper_opcode, mask, mnemonic, flags] { instr_data };
 
 			if ((instruction.instruction & mask) == proper_opcode) {
 				auto& destination		= registers::x_reg_name_table[instruction.rd].second;
@@ -257,12 +212,17 @@ namespace riscv
 
 		for (auto& instr_data : potential_instructions)
 		{
-			auto& [proper_opcode, mask, mnemonic, is_store_or_load, is_floating_point] { instr_data };
+			auto& [proper_opcode, mask, mnemonic, flags] { instr_data };
 
 			if ((instruction.instruction & mask) == proper_opcode) {
 				auto& destination		= registers::x_reg_name_table[instruction.rs2].second;
 				auto& source			= registers::x_reg_name_table[instruction.rs1].second;
 				signed int immediate	= 0;
+
+				if (flags.is_float) {
+					destination = registers::f_reg_name_table[instruction.rs2].second;
+					source = registers::f_reg_name_table[instruction.rs1].second;
+				}
 
 				immediate |= instruction.imm_a;
 				immediate |= (instruction.imm_b << 5);
@@ -278,13 +238,13 @@ namespace riscv
 
 		for (auto& instr_data : potential_instructions)
 		{
-			auto& [proper_opcode, mask, mnemonic, is_store_or_load, is_floating_point] { instr_data };
+			auto& [proper_opcode, mask, mnemonic, flags] { instr_data };
 
 			if ((instruction.instruction & mask) == proper_opcode) {
 				auto& destination = registers::x_reg_name_table[instruction.rd].second;
 				signed int immediate = 0;
 
-				if (is_floating_point)
+				if (flags.is_float)
 					destination = registers::f_reg_name_table[instruction.rd].second;
 				
 				//double check

@@ -11,6 +11,7 @@ namespace riscv {
 			return instruction & 0x0000007f;
 		}
 
+		//add errorchecks here omegalul
 		const type_identifier object::set_instruction_format(const uint32_t instruction) const
 		{
 			const uint8_t opcode = get_opcode(instruction);

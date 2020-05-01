@@ -30,7 +30,6 @@ namespace riscv {
 
 		void fence_instruction_handler(const std::string& mnemonic, const signed int& imm);
 		void float_instruction_handler(const instruction::type_r& instruction, instruction_data instr_data);
-		void sl_instruction_handler(const signed int& imm);
 		void a_ext_instruction_handler(const instruction::type_r& instruction, instruction_data instr_data);
 
 	public:

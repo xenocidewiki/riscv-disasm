@@ -29,14 +29,14 @@ namespace riscv
 			uint8_t flag;
 			struct
 			{
-				bool is_float : 1;
-				bool is_shamt : 1;
-				bool is_fence : 1;
-				bool is_e_sys : 1;
-				bool is_imm_csr : 1;
-				bool is_sl : 1;
-				bool is_a_ext : 1;
 				bool is_special_float : 1;
+				bool is_a_ext : 1;
+				bool is_sl : 1;
+				bool is_imm_csr : 1;
+				bool is_e_sys : 1;
+				bool is_fence : 1;
+				bool is_shamt : 1;
+				bool is_float : 1;
 			};
 
 			instruction_flags(const uint8_t& f) : flag{ f } {}

@@ -55,6 +55,7 @@ namespace riscv
 			std::cout << mnemonic << " " << pre_str << ", " << succ_str << "\n";
 		}
 	}
+
 	void disassembler::float_instruction_handler(const instruction::type_r& instruction, instruction_data instr_data)
 	{
 		auto& [proper_opcode, mask, mnemonic, flags] { instr_data };
@@ -70,12 +71,6 @@ namespace riscv
 		}
 
 		std::cout << mnemonic << "(" << mode << ") " << destination << ", " << first << ", " << last << "\n";
-	}
-	
-
-	void disassembler::sl_instruction_handler(const signed int& imm)
-	{
-
 	}
 
 	void disassembler::a_ext_instruction_handler(const instruction::type_r& instruction, instruction_data instr_data)
@@ -96,7 +91,7 @@ namespace riscv
 		if (rl)
 			aq_rl.append(".RL");
 
-		if (flags.is_sl)
+		if (mnemonic == "LR.W" || mnemonic == "LR.D")
 			std::cout << mnemonic << aq_rl << " " << destination << ", (" << address << ")\n";
 		else 
 			std::cout << mnemonic << aq_rl << " " << destination << ", " << middle << ", (" << address << ")\n";

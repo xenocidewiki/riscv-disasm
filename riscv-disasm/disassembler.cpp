@@ -102,6 +102,11 @@ namespace riscv
 				if (flags.is_shamt)
 					immediate = (immediate & 0x3F); //This handles both the RV64I and RV32I case, note that this is 000000111111, this will pull out the shamt correctly for both, look in manual
 
+				if (flags.is_sl) {
+					std::cout << mnemonic << " " << destination << ", 0x" << std::hex << immediate << "(" << source << ")\n";
+					return;
+				}
+
 				std::cout << mnemonic << " " << destination << ", " << source << ", 0x" << std::hex << immediate << "\n";
 				return;
 			}
@@ -221,7 +226,7 @@ namespace riscv
 
 				if (flags.is_float) {
 					destination = registers::f_reg_name_table[instruction.rs2].second;
-					source = registers::f_reg_name_table[instruction.rs1].second;
+					source		= registers::f_reg_name_table[instruction.rs1].second;
 				}
 
 				immediate |= instruction.imm_a;

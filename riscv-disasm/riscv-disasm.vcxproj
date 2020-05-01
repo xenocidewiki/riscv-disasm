@@ -142,7 +142,7 @@
   <ItemGroup>
     <ClCompile Include="disassembler.cpp" />
     <ClCompile Include="elf.cpp" />
-    <ClCompile Include="instruction.cpp" />
+    <ClCompile Include="instructions.cpp" />
     <ClCompile Include="instruction_handlers.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="pe.cpp" />

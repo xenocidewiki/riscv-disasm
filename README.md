@@ -9,3 +9,6 @@ Upcoming is support for the C extension and file format parsing for ELF and PE f
 
 
 Work on more efficient code and structure will be done at some point in time.
+
+
+Note: this software is not finished (yet) and has not been properly tested.

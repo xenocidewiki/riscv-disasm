@@ -26,7 +26,7 @@ namespace riscv
 	{
 		enum class type_identifier : uint8_t
 		{
-			R, R4, I, S, B, U, J
+			R, R4, I, S, B, U, J, CEXT
 		};
 
 		enum class extensions
@@ -38,7 +38,8 @@ namespace riscv
 			A,
 			F,
 			D,
-			Q
+			Q,
+			C
 		};
 
 		union instruction_flags {
@@ -168,6 +169,121 @@ namespace riscv
 			};
 		};
 
+		//CEXT types
+		union type_cr
+		{
+			uint16_t instruction;
+			struct
+			{
+				uint16_t opcode : 2;
+				uint16_t rs2 : 5;
+				uint16_t rs1 : 5;
+				uint16_t funct4 : 4;
+			};
+		};
+
+		union type_ci
+		{
+			uint16_t instruction;
+			struct
+			{
+				uint16_t opcode : 2;
+				int16_t imm1 : 5;
+				uint16_t rs1 : 5;
+				int16_t imm2 : 1;
+				uint16_t funct3 : 3;
+			};
+		};
+
+		union type_css
+		{
+			uint16_t instruction;
+			struct
+			{
+				uint16_t opcode : 2;
+				uint16_t rs2 : 5;
+				int16_t imm : 6;
+				uint16_t funct3 : 3;
+			};
+		};
+
+		union type_ciw
+		{
+			uint16_t instruction;
+			struct
+			{
+				uint16_t opcode : 2;
+				uint16_t rd : 3;
+				int16_t imm : 8;
+				uint16_t funct3 : 3;
+			};
+		};
+
+		union type_cl
+		{
+			uint16_t instruction;
+			struct
+			{
+				uint16_t opcode : 2;
+				uint16_t rd : 3;
+				int16_t imm1 : 2;
+				uint16_t rs1 : 3;
+				int16_t imm2 : 3;
+				uint16_t funct3 : 3;
+			};
+		};
+
+		union type_cs
+		{
+			uint16_t instruction;
+			struct
+			{
+				uint16_t opcode : 2;
+				uint16_t rs2 : 3;
+				int16_t imm1 : 2;
+				uint16_t rs1 : 3;
+				int16_t imm2 : 3;
+				uint16_t funct3 : 3;
+			};
+		};
+
+		union type_ca
+		{
+			uint16_t instruction;
+			struct
+			{
+				uint16_t opcode : 2;
+				uint16_t rs2 : 3;
+				uint16_t funct2 : 2;
+				uint16_t rs1 : 3;
+				int16_t funct6 : 6;
+			};
+		};
+
+		union type_cb
+		{
+			uint16_t instruction;
+			struct
+			{
+				uint16_t opcode : 2;
+				uint16_t offset1 : 5;
+				uint16_t rs1 : 3;
+				uint16_t offset2 : 3;
+				uint16_t funct3 : 3;
+			};
+		};
+
+		union type_cj
+		{
+			uint16_t instruction;
+			struct
+			{
+				uint16_t opcode : 2;
+				uint16_t jump_target : 11;
+				uint16_t funct3 : 3;
+			};
+		};
+
 		class object
 		{
 			using instruction_format = std::variant<type_r, type_r4, type_i, type_s, type_b, type_u, type_j>;
@@ -177,6 +293,7 @@ namespace riscv
 
 			const uint8_t get_opcode(const uint32_t instruction) const;
 			const type_identifier set_instruction_format(const uint32_t instruction) const;
+			const type_identifier cext_handler(const uint16_t instruction) const;
 			const instruction_format set_instruction_data(const type_identifier type, const uint32_t instruction);
 
 		public:
@@ -216,7 +333,15 @@ namespace riscv
 			{0x47, type_identifier::R4}, //FMSUB.S/D/Q
 			{0x4B, type_identifier::R4}, //FNMSUB.S/D/Q
 			{0x4F, type_identifier::R4}, //FNMADD.S/D/Q
-			{0x53, type_identifier::R} //Everything else
+			{0x53, type_identifier::R}, //Everything else
+
+			//C Extension
+			{0x0, type_identifier::CEXT},
+			{0x1, type_identifier::CEXT},
+			{0x2, type_identifier::CEXT},
+			{0x21, type_identifier::CEXT},
+			{0x41, type_identifier::CEXT},
+			{0x61, type_identifier::CEXT}
 		};
 
 		/*
@@ -226,7 +351,78 @@ namespace riscv
 		
 		//essentially maps each opcode to a set of instructions with said opcode, which each have a { match, mask, mnemonic, is_load_or_store_instr, is_floating_pt } tuple that we can use for parsing and checking which instruction it actually is
 		//change to constexpr when msvc decides to fucking implement it -_-
-		const std::unordered_map<uint8_t, const std::vector<std::tuple<uint32_t, uint32_t, std::string, instruction_flags>> > instruction_table {
+		const std::unordered_map<uint8_t, const std::vector<std::tuple<uint32_t, uint32_t, std::string, instruction_flags>>> instruction_table {
+			//CEXT
+			//TODO: fix the instruction_flags for this ext
+			{ 0x1, { 
+						{ 0x1, 0xffff, "C.NOP", 0b00000000 },
+						{ 0x6101, 0xef83, "C.ADDI16SP", 0b00000000 },
+						{ 0x1, 0xe003, "C.ADDI", 0b00000000 },
+						{ 0x2001, 0xe003, "C.JAL", 0b00000000 },
+						{ 0x4001, 0xe003, "C.LI", 0b00000000 },
+						{ 0x6001, 0xe003, "C.LUI", 0b00000000 },
+						{ 0x8001, 0xec03, "C.SRLI", 0b00000000 },
+						{ 0x8401, 0xec03, "C.SRAI", 0b00000000 },
+						{ 0x8801, 0xec03, "C.ANDI", 0b00000000 },
+						{ 0x8c01, 0xfc63, "C.SUB", 0b00000000 },
+						{ 0xa001, 0xe003, "C.J", 0b00000000 },
+						{ 0xc001, 0xe003, "C.BEQZ", 0b00000000 },
+						{ 0xe001, 0xe003, "C.BNEZ", 0b00000000 },
+						{ 0x2001, 0xe003, "C.ADDIW", 0b00000000 },
+						{ 0x8001, 0xfc03, "C.SRLI.RV32", 0b00000000 },
+						{ 0x8401, 0xfc03, "C.SRAI.RV32", 0b00000000 },
+						{ 0x9c01, 0xfc63, "C.SUBW", 0b00000000 }
+					} 
+			},
+
+			{ 0x2, {
+						{ 0x8002, 0xf07f, "C.JR", 0b00000000 },
+						{ 0x9002, 0xf07f, "C.JALR", 0b00000000 },
+						{ 0x9002, 0xffff, "C.EBREAK", 0b00000000 },
+						{ 0x2, 0xe003, "C.SLLI", 0b00000000 },
+						{ 0x2002, 0xe003, "C.FLDSP", 0b00000000 },
+						{ 0x4002, 0xe003, "C.LWSP", 0b00000000 },
+						{ 0x6002, 0xe003, "C.FLWSP", 0b00000000 },
+						{ 0x8002, 0xf003, "C.MV", 0b00000000 },
+						{ 0x9002, 0xf003, "C.ADD", 0b00000000 },
+						{ 0xa002, 0xe003, "C.FSDSP", 0b00000000 },
+						{ 0xc002, 0xe003, "C.SWSP", 0b00000000 },
+						{ 0xe002, 0xe003, "C.FSWSP", 0b00000000 },
+						{ 0x6002, 0xe003, "C.LDSP", 0b00000000 },
+						{ 0xe002, 0xe003, "C.SDSP", 0b00000000 },
+						{ 0x2, 0xf003, "C.SLLI.RV32", 0b00000000 }
+					} 
+			},
+
+			{ 0x0, { 
+						{ 0x0, 0xe003, "C.ADDI4SPN", 0b00000000 },
+						{ 0x2000, 0xe003, "C.FLD", 0b00000000 },
+						{ 0x4000, 0xe003, "C.LW", 0b00000000 },
+						{ 0x6000, 0xe003, "C.FLW", 0b00000000 },
+						{ 0xa000, 0xe003, "C.FSD", 0b00000000 },
+						{ 0xc000, 0xe003, "C.SW", 0b00000000 },
+						{ 0xe000, 0xe003, "C.FSW", 0b00000000 },
+						{ 0x6000, 0xe003, "C.LD", 0b00000000 },
+						{ 0xe000, 0xe003, "C.SD", 0b00000000 }
+					} 
+			},
+
+			{ 0x21, { 
+						{ 0x8c21, 0xfc63, "C.XOR", 0b00000000 },
+						{ 0x9c21, 0xfc63, "C.ADDW", 0b00000000 }
+					} 
+			},
+
+			{ 0x41, {
+						{ 0x8c41, 0xfc63, "C.OR", 0b00000000 }
+					} 
+			},
+
+			{ 0x61, {
+						{ 0x8c61, 0xfc63, "C.AND", 0b00000000 }
+					} 
+			},
+
 			//RV32I Instructions
 			{ 0x63, {
 						{ 0x63, 0x707f, "BEQ", 0b00000000 }, 

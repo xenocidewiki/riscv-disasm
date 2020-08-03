@@ -59,6 +59,10 @@ namespace riscv {
 			case type_identifier::U:
 				return type_u{ instruction };
 
+			case type_identifier::CEXT:
+				//return cext_handler(instruction);
+				break;
+
 			default:
 				return type_r{ 0 };
 			}

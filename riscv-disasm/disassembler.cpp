@@ -39,7 +39,7 @@ namespace riscv
 	{
 		for (const instruction::object& instruction : m_instructions)
 		{
-			switch(instruction.get_type()) 
+			switch (instruction.get_type())
 			{
 			case instruction::type_identifier::R:
 				parse_instruction(std::get<instruction::type_r>(instruction.get_data()));
@@ -84,9 +84,9 @@ namespace riscv
 			auto& [proper_opcode, mask, mnemonic, flags] { instr_data };
 
 			if ((instruction.instruction & mask) == proper_opcode) {
-				auto& destination		= registers::x_reg_name_table[instruction.rd].second;
-				auto& source			= registers::x_reg_name_table[instruction.rs1].second;
-				signed int immediate	= instruction.imm;
+				auto& destination = registers::x_reg_name_table[instruction.rd].second;
+				auto& source = registers::x_reg_name_table[instruction.rs1].second;
+				signed int immediate = instruction.imm;
 
 				if (flags.is_fence) {
 					fence_instruction_handler(mnemonic, immediate);
@@ -110,7 +110,7 @@ namespace riscv
 				//Make better l8r
 				if (flags.is_float) {
 					destination = registers::f_reg_name_table[instruction.rd].second;
-					source		= registers::f_reg_name_table[instruction.rs1].second;
+					source = registers::f_reg_name_table[instruction.rs1].second;
 				}
 
 				//check for shamt instructions
@@ -149,9 +149,9 @@ namespace riscv
 					return;
 				}
 
-				auto& destination	= registers::x_reg_name_table[instruction.rd].second;
-				auto& middle		= registers::x_reg_name_table[instruction.rs1].second;
-				auto& last			= registers::x_reg_name_table[instruction.rs2].second;
+				auto& destination = registers::x_reg_name_table[instruction.rd].second;
+				auto& middle = registers::x_reg_name_table[instruction.rs1].second;
+				auto& last = registers::x_reg_name_table[instruction.rs2].second;
 
 				std::cout << mnemonic << " " << destination << ", " << middle << ", " << last << "\n";
 
@@ -169,11 +169,11 @@ namespace riscv
 			auto& [proper_opcode, mask, mnemonic, flags] { instr_data };
 
 			if ((instruction.instruction & mask) == proper_opcode) {
-				auto& destination	= registers::f_reg_name_table[instruction.rd].second;
-				auto& first			= registers::f_reg_name_table[instruction.rs1].second;
-				auto& middle		= registers::f_reg_name_table[instruction.rs2].second;
-				auto& last			= registers::f_reg_name_table[instruction.rs3].second;
-				auto& mode			= instruction::float_rounding_name[instruction.funct3].second;
+				auto& destination = registers::f_reg_name_table[instruction.rd].second;
+				auto& first = registers::f_reg_name_table[instruction.rs1].second;
+				auto& middle = registers::f_reg_name_table[instruction.rs2].second;
+				auto& last = registers::f_reg_name_table[instruction.rs3].second;
+				auto& mode = instruction::float_rounding_name[instruction.funct3].second;
 
 				std::cout << mnemonic << "(" << mode << ") " << destination << ", " << first << ", " << middle << ", " << last << "\n";
 
@@ -191,9 +191,9 @@ namespace riscv
 			auto& [proper_opcode, mask, mnemonic, flags] { instr_data };
 
 			if ((instruction.instruction & mask) == proper_opcode) {
-				auto& destination		= registers::x_reg_name_table[instruction.rs1].second;
-				auto& source			= registers::x_reg_name_table[instruction.rs2].second;
-				signed int immediate	= 0;
+				auto& destination = registers::x_reg_name_table[instruction.rs1].second;
+				auto& source = registers::x_reg_name_table[instruction.rs2].second;
+				signed int immediate = 0;
 
 				//Might be wrong, make sure to double check....
 				immediate |= (instruction.imm_a << 11);
@@ -218,8 +218,8 @@ namespace riscv
 			auto& [proper_opcode, mask, mnemonic, flags] { instr_data };
 
 			if ((instruction.instruction & mask) == proper_opcode) {
-				auto& destination		= registers::x_reg_name_table[instruction.rd].second;
-				signed int immediate	= instruction.imm;
+				auto& destination = registers::x_reg_name_table[instruction.rd].second;
+				signed int immediate = instruction.imm;
 
 				std::cout << mnemonic << " " << destination << ", 0x" << std::hex << immediate << "\n";
 			}
@@ -235,13 +235,13 @@ namespace riscv
 			auto& [proper_opcode, mask, mnemonic, flags] { instr_data };
 
 			if ((instruction.instruction & mask) == proper_opcode) {
-				auto& destination		= registers::x_reg_name_table[instruction.rs2].second;
-				auto& source			= registers::x_reg_name_table[instruction.rs1].second;
-				signed int immediate	= 0;
+				auto& destination = registers::x_reg_name_table[instruction.rs2].second;
+				auto& source = registers::x_reg_name_table[instruction.rs1].second;
+				signed int immediate = 0;
 
 				if (flags.is_float) {
 					destination = registers::f_reg_name_table[instruction.rs2].second;
-					source		= registers::f_reg_name_table[instruction.rs1].second;
+					source = registers::f_reg_name_table[instruction.rs1].second;
 				}
 
 				immediate |= instruction.imm_a;
@@ -266,7 +266,7 @@ namespace riscv
 
 				if (flags.is_float)
 					destination = registers::f_reg_name_table[instruction.rd].second;
-				
+
 				//double check
 				immediate |= (instruction.imm_a << 12);
 				immediate |= (instruction.imm_b << 11);
@@ -277,4 +277,31 @@ namespace riscv
 			}
 		}
 	}
+
+	void parse_instruction(const instruction::type_cr& instruction)
+	{}
+
+	void parse_instruction(const instruction::type_ci& instruction)
+	{}
+
+	void parse_instruction(const instruction::type_css& instruction)
+	{}
+
+	void parse_instruction(const instruction::type_ciw& instruction)
+	{}
+
+	void parse_instruction(const instruction::type_cl& instruction)
+	{}
+
+	void parse_instruction(const instruction::type_cs& instruction)
+	{}
+
+	void parse_instruction(const instruction::type_ca& instruction)
+	{}
+
+	void parse_instruction(const instruction::type_cb& instruction)
+	{}
+
+	void parse_instruction(const instruction::type_cj& instruction)
+	{}
 }

@@ -286,14 +286,14 @@ namespace riscv
 
 		class object
 		{
-			using instruction_format = std::variant<type_r, type_r4, type_i, type_s, type_b, type_u, type_j>;
+			using instruction_format = std::variant<type_r, type_r4, type_i, type_s, type_b, type_u, type_j, type_cr, type_ci, type_css, type_ciw, type_cl, type_cs, type_ca, type_cb, type_cj>;
 
 			const type_identifier m_type;
 			const instruction_format m_data;
 
 			const uint8_t get_opcode(const uint32_t instruction) const;
 			const type_identifier set_instruction_format(const uint32_t instruction) const;
-			const type_identifier cext_handler(const uint16_t instruction) const;
+			const instruction_format cext_handler(const uint16_t instruction) const;
 			const instruction_format set_instruction_data(const type_identifier type, const uint32_t instruction);
 
 		public:

@@ -43,6 +43,15 @@ namespace riscv {
 		void parse_instruction(const instruction::type_u& instruction);
 		void parse_instruction(const instruction::type_s& instruction);
 		void parse_instruction(const instruction::type_j& instruction);
+		void parse_instruction(const instruction::type_cr& instruction);
+		void parse_instruction(const instruction::type_ci& instruction);
+		void parse_instruction(const instruction::type_css& instruction);
+		void parse_instruction(const instruction::type_ciw& instruction);
+		void parse_instruction(const instruction::type_cl& instruction);
+		void parse_instruction(const instruction::type_cs& instruction);
+		void parse_instruction(const instruction::type_ca& instruction);
+		void parse_instruction(const instruction::type_cb& instruction);
+		void parse_instruction(const instruction::type_cj& instruction);
 
 		void fence_instruction_handler(const std::string& mnemonic, const signed int& imm);
 		void float_instruction_handler(const instruction::type_r& instruction, instruction_data instr_data);
